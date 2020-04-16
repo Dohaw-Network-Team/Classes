@@ -95,7 +95,7 @@ public class AttributeManager extends Utils{
 		attrList.set(2, "RangedDamage: " + newAttr.get("RangedDamage"));
 		attrList.set(4, "SpellPower: " + newAttr.get("SpellPower"));
 		attrList.set(5, "Strength: " + newAttr.get("Strength"));
-		attrList.set(6, "Tougness: " + newAttr.get("Toughness"));
+		attrList.set(6, "Toughness: " + newAttr.get("Toughness"));
 
 		cm.setValue("Players." + p.getName() + ".Attributes", attrList);
 
@@ -108,11 +108,14 @@ public class AttributeManager extends Utils{
 	public void restoreAttributes(HashMap<String, Double> oldAttr, Player p){
 
 		ConfigManager cm = new ConfigManager(plugin, "players.yml");
+		List<String> attrList = cm.getList("Players." + p.getName() + ".Attributes");
 
-		cm.setValue("Players." + p.getName() + ".Attributes.RangedDamage", "RangedDamage: " + oldAttr.get("RangedDamage"));
-		cm.setValue("Players." + p.getName() + ".Attributes.SpellPower", "SpellPower: " + oldAttr.get("SpellPower"));
-		cm.setValue("Players." + p.getName() + ".Attributes.Strength", "Strength: " + oldAttr.get("Strength"));
-		cm.setValue("Players." + p.getName() + ".Attributes.Strength", "Tougness: " + oldAttr.get("Strength"));
+		attrList.set(2, "RangedDamage: " + oldAttr.get("RangedDamage"));
+		attrList.set(4, "SpellPower: " + oldAttr.get("SpellPower"));
+		attrList.set(5, "Strength: " + oldAttr.get("Strength"));
+		attrList.set(6, "Toughness: " + oldAttr.get("Toughness"));
+
+		cm.setValue("Players." + p.getName() + ".Attributes", attrList);
 
 		cm.saveCustomConfig();
 	}
