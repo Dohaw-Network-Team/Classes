@@ -33,11 +33,16 @@
   </build>
   
   <repositories>
+    <repository>
+      <id>dohaw-repo</id>
+      <url>https://raw.githubusercontent.com/Dohaw-Network-Team/maven-repo/master/</url>
+    </repository>
  	<!-- This adds the Spigot Maven repository to the build -->
     <repository>
         <id>spigot-repo</id>
         <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
+
    </repositories>
   
   <dependencies>

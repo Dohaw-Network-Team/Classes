@@ -16,7 +16,7 @@ import me.caleb.Classes.utils.managers.ClassManager;
 import me.caleb.Classes.utils.managers.ConfigManager;
 
 public class Commands extends Utils implements CommandExecutor{
-
+//Testing
 	private Main plugin;
 	FileConfiguration config;
 	
