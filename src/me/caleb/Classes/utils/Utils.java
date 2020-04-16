@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-public class Utils extends me.caleb.Clan.utils.Utils{
+public class Utils{
 
 	public static String firstUppercaseRestLowercase(String s) {
 		return s.substring(0,1) + s.substring(1);
