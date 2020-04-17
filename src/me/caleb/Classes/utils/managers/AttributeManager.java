@@ -127,18 +127,24 @@ public class AttributeManager extends Utils{
 	/*
 	Going back to classes normal speed without enchants
 	 */
-	public void reApplyClassSpeedModifier(){
+	public void reApplyClassSpeedModifier() {
 
-		for(AttributeModifier a : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()) {
+		double quicknessMult;
+
+		for (AttributeModifier a : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()) {
 			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).removeModifier(a);
 		}
+
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", .01, Operation.ADD_NUMBER));
 
-		double quicknessMult = Double.parseDouble(cma.getValue("Attributes.Quickness." + attr.get("Quickness").intValue()));
+		if (attr.get("Quickness") == null || cma.getValue("Attributes.Quickness.") == null) {
+			quicknessMult = 1;
+		} else {
+			quicknessMult = Double.parseDouble(cma.getValue("Attributes.Quickness." + attr.get("Quickness").intValue()));
+		}
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", quicknessMult, Operation.MULTIPLY_SCALAR_1));
 
 	}
-
 	/*
 	Going back to default Minecraft Attribute movement
 	 */
