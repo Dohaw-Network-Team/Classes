@@ -15,18 +15,16 @@ import org.bukkit.entity.Player;
 import me.caleb.Classes.Main;
 import me.caleb.Classes.utils.Utils;
 
-import static java.lang.Double.parseDouble;
-
 public class AttributeManager extends Utils{
 
 	protected Player p;
 	protected Main plugin;
 	protected ConfigManager cma;
 	protected HashMap<String, Double> attr;
-	
+
 	/*
 	 * Attributes are the following:
-	 * 
+	 *
 	 * Strength
 	 * Quickness
 	 * SpellPower
@@ -34,36 +32,36 @@ public class AttributeManager extends Utils{
 	 * Resistance
 	 * RangedDamage
 	 * MaxHealth
-	 * 
+	 *
 	 */
-	
+
 	public AttributeManager(Main plugin, Player p, String cl) {
-		this.p = p;	
+		this.p = p;
 		this.plugin = plugin;
 		cma = new ConfigManager(plugin, "attributes.yml");
 		attr = getPlayerAttributes();
 	}
-	
+
 	public AttributeManager(Main plugin, Entity e) {
 		this.plugin = plugin;
 		this.p = Bukkit.getPlayer(e.getUniqueId());
 		cma = new ConfigManager(plugin, "attributes.yml");
 		attr = getPlayerAttributes();
 	}
-	
+
 	public double getMaxDifference() {
 		FileConfiguration config = plugin.getConfig();
 		return config.getDouble("MaxDifferenceAmount");
 	}
-	
+
 	public void applyAttributes() {
-		
+
 		HashMap<String, Double> playerAttributes = getPlayerAttributes();
 
-		double hpAdditive = parseDouble(cma.getValue("Attributes.MaxHealth." + playerAttributes.get("MaxHealth").intValue()));
-		double strengthMult = parseDouble(cma.getValue("Attributes.Strength." + playerAttributes.get("Strength").intValue()));
-		double quicknessMult = parseDouble(cma.getValue("Attributes.Quickness." + playerAttributes.get("Quickness").intValue()));
-		
+		double hpAdditive = Double.parseDouble(cma.getValue("Attributes.MaxHealth." + playerAttributes.get("MaxHealth").intValue()));
+		double strengthMult = Double.parseDouble(cma.getValue("Attributes.Strength." + playerAttributes.get("Strength").intValue()));
+		double quicknessMult = Double.parseDouble(cma.getValue("Attributes.Quickness." + playerAttributes.get("Quickness").intValue()));
+
 		p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).addModifier(new AttributeModifier("Strength", strengthMult, Operation.MULTIPLY_SCALAR_1));
 		p.getAttribute(Attribute.GENERIC_MAX_HEALTH).addModifier(new AttributeModifier("Max_HP", hpAdditive, Operation.ADD_NUMBER));
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", quicknessMult, Operation.MULTIPLY_SCALAR_1));
@@ -136,7 +134,7 @@ public class AttributeManager extends Utils{
 		}
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", .01, Operation.ADD_NUMBER));
 
-		double quicknessMult = parseDouble(cma.getValue("Attributes.Quickness." + attr.get("Quickness").intValue()));
+		double quicknessMult = Double.parseDouble(cma.getValue("Attributes.Quickness." + attr.get("Quickness").intValue()));
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", quicknessMult, Operation.MULTIPLY_SCALAR_1));
 
 	}
@@ -174,115 +172,115 @@ public class AttributeManager extends Utils{
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", (currentSpeed * newMult), Operation.MULTIPLY_SCALAR_1));
 
 	}
-	
+
 	/*
 	 * Factors in RangedDmg attribute
 	 */
 	public double getNewRangedDmg(double initDmg) {
-		
+
 		double rangedDmgMult;
-		
+
 		if(attr.get("RangedDamage").intValue() != 1) {
-			rangedDmgMult = parseDouble(cma.getValue("Attributes.RangedDamage." + attr.get("RangedDamage").intValue()));
+			rangedDmgMult = Double.parseDouble(cma.getValue("Attributes.RangedDamage." + attr.get("RangedDamage").intValue()));
 		}else {
 			rangedDmgMult = 1.0;
 		}
-		
+
 		double temp = initDmg * rangedDmgMult;
 		double newDmg = initDmg + temp;
 		return ThreadLocalRandom.current().nextDouble(newDmg, (newDmg + getMaxDifference()));
 	}
-	
+
 	/*
 	 * Factors in Toughness attribute
 	 */
 	public double factorInToughness(double initDmg) {
 
 		try {
-			double toughnessMult = parseDouble(cma.getValue("Attributes.Toughness." + attr.get("Toughness").intValue()));
+			double toughnessMult = Double.parseDouble(cma.getValue("Attributes.Toughness." + attr.get("Toughness").intValue()));
 			double temp = initDmg * toughnessMult;
 			return (initDmg - temp);
 		}catch(NumberFormatException e) {
 			//If the value is normal
 			return initDmg;
 		}
-			
+
 	}
-	
+
 	/*
 	 * Factors in Resistance attribute
 	 */
 	public double factorInResistance(double initDmg, potionTypes potion) {
-		
+
 		try {
-			double resistanceMult = parseDouble(cma.getValue("Attributes.Resistance." + attr.get("Resistance").intValue()));
+			double resistanceMult = Double.parseDouble(cma.getValue("Attributes.Resistance." + attr.get("Resistance").intValue()));
 			double temp = initDmg * resistanceMult;
 			return (initDmg - temp);
 		}catch(NumberFormatException e) {
 			return initDmg;
-		}	
+		}
 			/*
 		}else if(potion.equals(potionTypes.SLOWNESS)) {
-			*/	
+			*/
 	}
-	
+
 	public enum potionTypes{
 		POISON,
 		SLOWNESS
 	}
-	
+
 	/*
 	 * Melee hits
 	 */
 	public double getNewHitDmg(double initDmg) {
-		double strengthMult = parseDouble(cma.getValue("Attributes.Strength." + attr.get("Strength").intValue()));
+		double strengthMult = Double.parseDouble(cma.getValue("Attributes.Strength." + attr.get("Strength").intValue()));
 		double temp = initDmg * strengthMult;
 		double newDmg = initDmg + temp;
 		return ThreadLocalRandom.current().nextDouble(newDmg, (newDmg + getMaxDifference()));
 	}
-	
+
 	/*
 	 * Spell damaged
 	 */
 	public double getNewSpellDmg(double initDmg) {
 		double spellPowerMult = 1;
 		try {
-			spellPowerMult = parseDouble(cma.getValue("Attributes.SpellPower." + attr.get("SpellPower").intValue()));
+			spellPowerMult = Double.parseDouble(cma.getValue("Attributes.SpellPower." + attr.get("SpellPower").intValue()));
 		}catch(NumberFormatException e) {
 			return initDmg;
 		}
-		
+
 		double temp = initDmg * spellPowerMult;
 		double newDmg = initDmg + temp;
 		return ThreadLocalRandom.current().nextDouble(newDmg, (newDmg + getMaxDifference()));
 	}
-	
+
 	public HashMap<String, Double> getPlayerAttributes() {
-		
+
 		ConfigManager cm = new ConfigManager(plugin, "players.yml");
-		
+
 		HashMap<String, Double> attributes = new HashMap();
 		List<String> attr = cm.getList("Players." + p.getName() + ".Attributes");
-		
+
 		for(String line : attr) {
 			attributes.put(getKey(line), getValue(line));
 		}
-		
+
 		return attributes;
-		
+
 	}
-	
+
 	public String getKey(String line) {
 		String key;
 		String arrLine[] = line.split(" ");
 		key = arrLine[0];
 		return key.substring(0,key.length()-1);
 	}
-	
+
 	public double getValue(String line) {
 		double value;
 		String arrLine[] = line.split(" ");
-		return parseDouble(arrLine[1]);
+		return Double.parseDouble(arrLine[1]);
 	}
 
 }
