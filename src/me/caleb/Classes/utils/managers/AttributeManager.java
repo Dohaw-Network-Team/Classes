@@ -1,5 +1,6 @@
 package me.caleb.Classes.utils.managers;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -21,10 +22,10 @@ public class AttributeManager extends Utils{
 	protected Main plugin;
 	protected ConfigManager cma;
 	protected HashMap<String, Double> attr;
-	
+
 	/*
 	 * Attributes are the following:
-	 * 
+	 *
 	 * Strength
 	 * Quickness
 	 * SpellPower
@@ -32,36 +33,36 @@ public class AttributeManager extends Utils{
 	 * Resistance
 	 * RangedDamage
 	 * MaxHealth
-	 * 
+	 *
 	 */
-	
+
 	public AttributeManager(Main plugin, Player p, String cl) {
-		this.p = p;	
+		this.p = p;
 		this.plugin = plugin;
 		cma = new ConfigManager(plugin, "attributes.yml");
 		attr = getPlayerAttributes();
 	}
-	
+
 	public AttributeManager(Main plugin, Entity e) {
 		this.plugin = plugin;
 		this.p = Bukkit.getPlayer(e.getUniqueId());
 		cma = new ConfigManager(plugin, "attributes.yml");
 		attr = getPlayerAttributes();
 	}
-	
+
 	public double getMaxDifference() {
 		FileConfiguration config = plugin.getConfig();
 		return config.getDouble("MaxDifferenceAmount");
 	}
-	
+
 	public void applyAttributes() {
-		
+
 		HashMap<String, Double> playerAttributes = getPlayerAttributes();
 
 		double hpAdditive = Double.parseDouble(cma.getValue("Attributes.MaxHealth." + playerAttributes.get("MaxHealth").intValue()));
 		double strengthMult = Double.parseDouble(cma.getValue("Attributes.Strength." + playerAttributes.get("Strength").intValue()));
 		double quicknessMult = Double.parseDouble(cma.getValue("Attributes.Quickness." + playerAttributes.get("Quickness").intValue()));
-		
+
 		p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).addModifier(new AttributeModifier("Strength", strengthMult, Operation.MULTIPLY_SCALAR_1));
 		p.getAttribute(Attribute.GENERIC_MAX_HEALTH).addModifier(new AttributeModifier("Max_HP", hpAdditive, Operation.ADD_NUMBER));
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", quicknessMult, Operation.MULTIPLY_SCALAR_1));
@@ -145,6 +146,16 @@ public class AttributeManager extends Utils{
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", quicknessMult, Operation.MULTIPLY_SCALAR_1));
 
 	}
+
+	/*
+	Was originally for Frozen Touch Enchant
+	 */
+	public void restoreSpeedModifiers(Collection<AttributeModifier> sm){
+		for(AttributeModifier a : sm){
+			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(a);
+		}
+	}
+
 	/*
 	Going back to default Minecraft Attribute movement
 	 */
@@ -162,6 +173,20 @@ public class AttributeManager extends Utils{
 	}
 
 	/*
+	For Frozen touch enchant
+	 */
+	public double getSpeedValue(){
+		return p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue();
+	}
+
+	/*
+	For Frozen touch enchant
+	 */
+	public void setSpeedValue(double value){
+		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(value);
+	}
+
+	/*
 	For the swift foot enchant
 	 */
 	public void setSpeedModifiers(int lvl){
@@ -176,27 +201,26 @@ public class AttributeManager extends Utils{
 		removeSpeedModifiers();
 
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", (currentSpeed * newMult), Operation.MULTIPLY_SCALAR_1));
-
 	}
-	
+
 	/*
 	 * Factors in RangedDmg attribute
 	 */
 	public double getNewRangedDmg(double initDmg) {
-		
+
 		double rangedDmgMult;
-		
+
 		if(attr.get("RangedDamage").intValue() != 1) {
 			rangedDmgMult = Double.parseDouble(cma.getValue("Attributes.RangedDamage." + attr.get("RangedDamage").intValue()));
 		}else {
 			rangedDmgMult = 1.0;
 		}
-		
+
 		double temp = initDmg * rangedDmgMult;
 		double newDmg = initDmg + temp;
 		return ThreadLocalRandom.current().nextDouble(newDmg, (newDmg + getMaxDifference()));
 	}
-	
+
 	/*
 	 * Factors in Toughness attribute
 	 */
@@ -210,31 +234,31 @@ public class AttributeManager extends Utils{
 			//If the value is normal
 			return initDmg;
 		}
-			
+
 	}
-	
+
 	/*
 	 * Factors in Resistance attribute
 	 */
 	public double factorInResistance(double initDmg, potionTypes potion) {
-		
+
 		try {
 			double resistanceMult = Double.parseDouble(cma.getValue("Attributes.Resistance." + attr.get("Resistance").intValue()));
 			double temp = initDmg * resistanceMult;
 			return (initDmg - temp);
 		}catch(NumberFormatException e) {
 			return initDmg;
-		}	
+		}
 			/*
 		}else if(potion.equals(potionTypes.SLOWNESS)) {
-			*/	
+			*/
 	}
-	
+
 	public enum potionTypes{
 		POISON,
 		SLOWNESS
 	}
-	
+
 	/*
 	 * Melee hits
 	 */
@@ -244,45 +268,45 @@ public class AttributeManager extends Utils{
 		double newDmg = initDmg + temp;
 		return ThreadLocalRandom.current().nextDouble(newDmg, (newDmg + getMaxDifference()));
 	}
-	
+
 	/*
 	 * Spell damaged
 	 */
 	public double getNewSpellDmg(double initDmg) {
 		double spellPowerMult = 1;
 		try {
-			spellPowerMult = Double.parseDouble(cma.getValue("Attributes.SpellPower." + attr.get("SpellPower").intValue()));	
+			spellPowerMult = Double.parseDouble(cma.getValue("Attributes.SpellPower." + attr.get("SpellPower").intValue()));
 		}catch(NumberFormatException e) {
 			return initDmg;
 		}
-		
+
 		double temp = initDmg * spellPowerMult;
 		double newDmg = initDmg + temp;
 		return ThreadLocalRandom.current().nextDouble(newDmg, (newDmg + getMaxDifference()));
 	}
-	
+
 	public HashMap<String, Double> getPlayerAttributes() {
-		
+
 		ConfigManager cm = new ConfigManager(plugin, "players.yml");
-		
+
 		HashMap<String, Double> attributes = new HashMap();
 		List<String> attr = cm.getList("Players." + p.getName() + ".Attributes");
-		
+
 		for(String line : attr) {
 			attributes.put(getKey(line), getValue(line));
 		}
-		
+
 		return attributes;
-		
+
 	}
-	
+
 	public String getKey(String line) {
 		String key;
 		String arrLine[] = line.split(" ");
 		key = arrLine[0];
 		return key.substring(0,key.length()-1);
 	}
-	
+
 	public double getValue(String line) {
 		double value;
 		String arrLine[] = line.split(" ");
