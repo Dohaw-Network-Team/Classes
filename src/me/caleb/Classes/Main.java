@@ -2,7 +2,7 @@ package me.caleb.Classes;
 
 import java.io.File;
 
-import me.lucko.luckperms.LuckPerms;
+import net.luckperms.api.*;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
