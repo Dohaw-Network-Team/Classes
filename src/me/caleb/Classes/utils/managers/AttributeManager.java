@@ -82,7 +82,7 @@ public class AttributeManager extends Utils{
 			p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).removeModifier(a);
 		}
 
-		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", .01, Operation.ADD_NUMBER));
+		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
 	}
 
 	/*
@@ -135,14 +135,15 @@ public class AttributeManager extends Utils{
 		for (AttributeModifier a : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()) {
 			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).removeModifier(a);
 		}
-
-		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", .01, Operation.ADD_NUMBER));
+//
+		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
 
 		if (attr.get("Quickness") == null || cma.getValue("Attributes.Quickness.") == null) {
 			quicknessMult = 1;
 		} else {
 			quicknessMult = Double.parseDouble(cma.getValue("Attributes.Quickness." + attr.get("Quickness").intValue()));
 		}
+
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", quicknessMult, Operation.MULTIPLY_SCALAR_1));
 
 	}
@@ -163,7 +164,7 @@ public class AttributeManager extends Utils{
 		for(AttributeModifier a : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()) {
 			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).removeModifier(a);
 		}
-		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", .01, Operation.ADD_NUMBER));
+		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
 	}
 
 	public void removeStrengthModifiers(){
