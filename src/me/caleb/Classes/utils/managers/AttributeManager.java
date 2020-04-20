@@ -152,6 +152,7 @@ public class AttributeManager extends Utils{
 	Was originally for Frozen Touch Enchant
 	 */
 	public void restoreSpeedModifiers(Collection<AttributeModifier> sm){
+		removeSpeedModifiers();
 		for(AttributeModifier a : sm){
 			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(a);
 		}
@@ -181,24 +182,77 @@ public class AttributeManager extends Utils{
 
 		double currentSpeed = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue();
 		FileConfiguration config = getCustomEnchantsConfig();
-		removeSpeedModifiers();
 
 		if(enchantInitials.equalsIgnoreCase("SF")){
 
 			double mult = config.getDouble("Enchants.Swift_Foot.PercantageIncreasePerLevel." + lvl);
-			double desiredSpeed = (currentSpeed * mult) + currentSpeed;
 
-			double newMult = desiredSpeed / currentSpeed;
+			AttributeModifier speedModifier = null;
+			double newMult;
+			for(AttributeModifier am : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()){
+				if(am.getName().equalsIgnoreCase("Movement_Speed")){
+					speedModifier = am;
+				}
+			}
+			//Just in-case this is null, return. This should rarely be null.
+			if(speedModifier == null){
+				return;
+			}
+			newMult = speedModifier.getAmount() + mult;
 
+			removeSpeedModifiers();
 			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", newMult, Operation.MULTIPLY_SCALAR_1));
+
 		}else if(enchantInitials.equalsIgnoreCase("FT")){
+
 			double mult = config.getDouble("Enchants.Frozen_Touch.DecreasedPercentagePerLevel." + lvl);
-			double desiredSpeed = (currentSpeed * mult) + currentSpeed;
 
-			double newMult = desiredSpeed / currentSpeed;
+			AttributeModifier speedModifier = null;
+			double newMult;
+			for(AttributeModifier am : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()){
+				if(am.getName().equalsIgnoreCase("Movement_Speed")){
+					speedModifier = am;
+				}
+			}
+			//Just in-case this is null, return. This should rarely be null.
+			if(speedModifier == null){
+				return;
+			}
 
+			removeSpeedModifiers();
+			newMult = speedModifier.getAmount() - mult;
 			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", newMult, Operation.MULTIPLY_SCALAR_1));
+
 		}
+
+	}
+
+	/*
+	For the Berserker Enchant
+	 */
+	public void setStrengthModifier(int lvl){
+		Bukkit.broadcastMessage("Modifiers: " + p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE));
+		FileConfiguration config = getCustomEnchantsConfig();
+		double mult = config.getDouble("Enchants.Berserker.StrengthIncreasePerLevel" + lvl);
+
+		AttributeModifier speedModifier = null;
+		double newMult;
+		for(AttributeModifier am : p.getAttribute(Attribute.GENERIC_ATTACK_SPEED).getModifiers()){
+			if(am.getName().equalsIgnoreCase("Strength")){
+				speedModifier = am;
+			}
+		}
+		//Just in-case this is null, return. This should rarely be null.
+		if(speedModifier == null){
+			return;
+		}
+
+		removeStrengthModifiers();
+		newMult = speedModifier.getAmount() + mult;
+		Bukkit.broadcastMessage("Old mult: " + speedModifier.getAmount());
+		Bukkit.broadcastMessage("New mult: " + newMult);
+		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Strength", newMult, Operation.MULTIPLY_SCALAR_1));
+
 
 	}
 
