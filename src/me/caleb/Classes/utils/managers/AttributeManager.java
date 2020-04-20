@@ -121,7 +121,7 @@ public class AttributeManager extends Utils{
 		cm.saveCustomConfig();
 	}
 
-	public FileConfiguration getCustomEnchantsConfig(int lvl){
+	public FileConfiguration getCustomEnchantsConfig(){
 		return plugin.getServer().getPluginManager().getPlugin("CustomEnchants").getConfig();
 	}
 
@@ -135,7 +135,7 @@ public class AttributeManager extends Utils{
 		for (AttributeModifier a : p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getModifiers()) {
 			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).removeModifier(a);
 		}
-//
+
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
 
 		if (attr.get("Quickness") == null || cma.getValue("Attributes.Quickness.") == null) {
@@ -173,35 +173,33 @@ public class AttributeManager extends Utils{
 		}
 	}
 
-	/*
-	For Frozen touch enchant
-	 */
-	public double getSpeedValue(){
-		return p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue();
-	}
 
 	/*
-	For Frozen touch enchant
+	For the swift foot enchant and Frozen Touch Enchant
 	 */
-	public void setSpeedValue(double value){
-		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(value);
-	}
-
-	/*
-	For the swift foot enchant
-	 */
-	public void setSpeedModifiers(int lvl){
+	public void setSpeedModifier(int lvl, String enchantInitials){
 
 		double currentSpeed = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).getValue();
-		FileConfiguration config = getCustomEnchantsConfig(lvl);
-
-		double mult = config.getDouble("Enchants.Swift_Foot.PercantageIncreasePerLevel." + lvl);
-		double desiredSpeed = (currentSpeed * mult) + currentSpeed;
-
-		double newMult = desiredSpeed / currentSpeed;
+		FileConfiguration config = getCustomEnchantsConfig();
 		removeSpeedModifiers();
 
-		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", (currentSpeed * newMult), Operation.MULTIPLY_SCALAR_1));
+		if(enchantInitials.equalsIgnoreCase("SF")){
+
+			double mult = config.getDouble("Enchants.Swift_Foot.PercantageIncreasePerLevel." + lvl);
+			double desiredSpeed = (currentSpeed * mult) + currentSpeed;
+
+			double newMult = desiredSpeed / currentSpeed;
+
+			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", newMult, Operation.MULTIPLY_SCALAR_1));
+		}else if(enchantInitials.equalsIgnoreCase("FT")){
+			double mult = config.getDouble("Enchants.Frozen_Touch.DecreasedPercentagePerLevel." + lvl);
+			double desiredSpeed = (currentSpeed * mult) + currentSpeed;
+
+			double newMult = desiredSpeed / currentSpeed;
+
+			p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", newMult, Operation.MULTIPLY_SCALAR_1));
+		}
+
 	}
 
 	/*
