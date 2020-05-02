@@ -147,6 +147,25 @@ public class AttributeManager extends Utils{
 		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Movement_Speed", quicknessMult, Operation.MULTIPLY_SCALAR_1));
 
 	}
+	public void reApplyClassStrengthModifier() {
+
+		double StrengthMult;
+
+		for (AttributeModifier a : p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).getModifiers()) {
+			p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).removeModifier(a);
+		}
+
+		p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).setBaseValue(0.1);
+
+		if (attr.get("Strength") == null || cma.getValue("Attributes.Strength.") == null) {
+			StrengthMult = 1;
+		} else {
+			StrengthMult = Double.parseDouble(cma.getValue("Attributes.Strength." + attr.get("Strength").intValue()));
+		}
+
+		p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).addModifier(new AttributeModifier("Strength", StrengthMult, Operation.MULTIPLY_SCALAR_1));
+
+	}
 
 	/*
 	Was originally for Frozen Touch Enchant
@@ -251,7 +270,7 @@ public class AttributeManager extends Utils{
 		newMult = speedModifier.getAmount() + mult;
 		Bukkit.broadcastMessage("Old mult: " + speedModifier.getAmount());
 		Bukkit.broadcastMessage("New mult: " + newMult);
-		p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).addModifier(new AttributeModifier("Strength", newMult, Operation.MULTIPLY_SCALAR_1));
+		p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE).addModifier(new AttributeModifier("Strength", newMult, Operation.MULTIPLY_SCALAR_1));
 
 
 	}
