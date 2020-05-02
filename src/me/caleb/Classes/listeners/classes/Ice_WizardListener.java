@@ -7,11 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -24,6 +20,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import me.caleb.Classes.Main;
@@ -49,7 +46,7 @@ public class Ice_WizardListener extends Utils implements Listener{
 		Player p = e.getPlayer();
 		ItemStack item = p.getItemInHand();
 		ClassManager cm = new ClassManager(plugin, p);
-		
+
 		if(!(e.getPlayer() instanceof Player)) return;
 		
 		if(!action.equals(Action.RIGHT_CLICK_AIR) && !action.equals(Action.RIGHT_CLICK_BLOCK)) return;
@@ -61,14 +58,47 @@ public class Ice_WizardListener extends Utils implements Listener{
 		if(!cm.getCl(p.getName()).equalsIgnoreCase("Ice_Wizard")) return;
 		
 		if(p.hasMetadata("betweenFireballs") && !p.getMetadata("betweenFireballs").isEmpty()) {
-			boolean betweenFireballs = p.getMetadata("betweenFireballs").get(0).asBoolean();
+			boolean betweenShots = p.getMetadata("betweenFireballs").get(0).asBoolean();
 			
-			//If they shot one fireball in between the tick interval.
-			//This prevents the spamming of fireballs
-			if(betweenFireballs == false) {
-				Fireball fireball = p.launchProjectile(Fireball.class);
-				fireball.setVelocity(fireball.getDirection().multiply(15));
-				fireball.setSilent(true);
+			//If they shot one shot in between the tick interval.
+			//This prevents the spamming of ice strikes
+			if(betweenShots == false) {
+
+				Item droppedItem = p.getWorld().dropItem(p.getEyeLocation(), new ItemStack(Material.PACKED_ICE));
+				droppedItem.getLocation().setDirection(p.getLocation().getDirection());
+				droppedItem.setVelocity(p.getLocation().getDirection().multiply(1.5));
+				//droppedItem.setGravity(false);
+				droppedItem.setPickupDelay(50);
+
+				final double ICE_STRIKE_RADIUS = 2;
+
+				new BukkitRunnable(){
+
+					@Override
+					public void run() {
+						Bukkit.broadcastMessage(droppedItem.getLocation().getY() + "");
+						if(!droppedItem.isOnGround() && (droppedItem.getLocation().getY() > 0.05 || droppedItem.getLocation().getY() < -0.05)){
+							List<Entity> nearbyEntities = droppedItem.getNearbyEntities(ICE_STRIKE_RADIUS, ICE_STRIKE_RADIUS, ICE_STRIKE_RADIUS);
+							Bukkit.broadcastMessage(nearbyEntities.toString());
+							//Removes yourself as a possible nearby entity
+							nearbyEntities.remove((Entity)p);
+							if(!nearbyEntities.isEmpty()){
+								Bukkit.broadcastMessage(nearbyEntities.toString());
+								droppedItem.remove();
+								Bukkit.broadcastMessage("Something has been hit!");
+								this.cancel();
+							}else{
+								Bukkit.broadcastMessage(nearbyEntities.toString());
+							}
+						}else{
+							Bukkit.broadcastMessage("It's probably at a velocity of 0");
+							this.cancel();
+						}
+					}
+				}.runTaskTimer(plugin, 0L, 1L);
+
+				//fireball.setVelocity(fireball.getDirection().multiply(15));
+				//fireball.setSilent(true);
 				p.setMetadata("betweenFireballs", new FixedMetadataValue(plugin, true));
 			}else {
 				return;
